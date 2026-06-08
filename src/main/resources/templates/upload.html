@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add a photo · Slow Gallery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" th:href="@{/css/wabi-sabi.css}">
+</head>
+<body>
+<div class="wrap">
+
+    <header class="masthead">
+        <a class="brand" th:href="@{/}">
+            <span class="brand__mark">侘寂</span>
+            <span>
+                <span class="brand__name">Slow Gallery</span>
+                <p class="brand__tag">a handmade place for imperfect, beautiful things</p>
+            </span>
+        </a>
+        <a class="btn btn--ghost" th:href="@{/}">← Back to the gallery</a>
+    </header>
+
+    <div class="note note--error" th:if="${error}" th:text="${error}">error</div>
+
+    <section class="sheet">
+        <h1>Add a photo</h1>
+        <p class="sheet__lead">A single image, and a few words about it. Nothing more is needed.</p>
+
+        <form method="post" th:action="@{/upload}" enctype="multipart/form-data">
+            <div class="field">
+                <label for="file">The image</label>
+                <label class="dropzone" for="file">
+                    <span class="dropzone__mark">⌖</span>
+                    <span class="dropzone__hint">Drop an image here, or click to choose</span>
+                    <span class="dropzone__name"></span>
+                    <input id="file" type="file" name="file" accept="image/*" required>
+                </label>
+            </div>
+
+            <div class="field">
+                <label for="description">A few words</label>
+                <textarea id="description" name="description"
+                          placeholder="Where it was, what it felt like…"></textarea>
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="btn btn--clay">Add to the gallery</button>
+                <a class="btn btn--ghost" th:href="@{/}">Cancel</a>
+            </div>
+        </form>
+    </section>
+
+    <footer class="footer">JPEG · PNG · WebP · GIF · AVIF — up to 10&nbsp;MB</footer>
+</div>
+
+<script th:src="@{/js/gallery.js}" defer></script>
+</body>
+</html>

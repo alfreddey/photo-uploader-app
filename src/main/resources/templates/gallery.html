@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>侘寂 · Slow Gallery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" th:href="@{/css/wabi-sabi.css}">
+</head>
+<body>
+<div class="wrap">
+
+    <header class="masthead">
+        <a class="brand" th:href="@{/}">
+            <span class="brand__mark">侘寂</span>
+            <span>
+                <span class="brand__name">Slow Gallery</span>
+                <p class="brand__tag">a handmade place for imperfect, beautiful things</p>
+            </span>
+        </a>
+        <a class="btn btn--clay" th:href="@{/upload}">✛&nbsp; Add a photo</a>
+    </header>
+
+    <div class="note" th:if="${flash}" th:text="${flash}">flash</div>
+    <div class="note note--error" th:if="${error}" th:text="${error}">error</div>
+
+    <!-- Empty state -->
+    <section class="empty" th:if="${#lists.isEmpty(photos)}">
+        <span class="empty__mark">空</span>
+        <h2>Nothing here yet</h2>
+        <p>An empty room, waiting. Add the first photo and watch it fill.</p>
+        <a class="btn btn--clay" th:href="@{/upload}">✛&nbsp; Add the first photo</a>
+    </section>
+
+    <!-- Bento grid -->
+    <main class="bento" th:unless="${#lists.isEmpty(photos)}">
+        <figure class="tile"
+                th:each="photo : ${photos}"
+                th:attr="data-full=${photo.url}, data-desc=${photo.description}">
+            <div class="tile__inner">
+                <button type="button" class="tile__open" aria-label="View photo">
+                    <img class="tile__img"
+                         th:src="${photo.url}"
+                         th:alt="${photo.description} ?: 'Untitled photo'"
+                         loading="lazy">
+                </button>
+
+                <figcaption class="tile__caption">
+                    <p th:if="${photo.description}" th:text="${photo.description}">A description</p>
+                    <span class="tile__date" th:text="${photo.displayDate}">1 Jan 2026</span>
+                </figcaption>
+
+                <form class="tile__delete" method="post"
+                      th:action="@{'/photos/' + ${photo.id} + '/delete'}"
+                      onsubmit="return confirm('Let this photo go?');">
+                    <button type="submit" title="Remove" aria-label="Remove photo">✕</button>
+                </form>
+            </div>
+        </figure>
+    </main>
+
+    <footer class="footer">
+        Stored in S3 · described in PostgreSQL · served through CloudFront ·
+        running on ECS Fargate
+    </footer>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="lightbox__close" aria-label="Close">✕</button>
+    <figure class="lightbox__frame">
+        <img class="lightbox__img" src="" alt="">
+        <figcaption class="lightbox__caption"></figcaption>
+    </figure>
+</div>
+
+<script th:src="@{/js/gallery.js}" defer></script>
+</body>
+</html>
