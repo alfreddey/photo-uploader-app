@@ -1,0 +1,12 @@
+target/
+uploads/
+*.iml
+.idea/
+.vscode/
+.git/
+.gitignore
+.github/
+docker-compose.yml
+Makefile
+README.md
+*.md

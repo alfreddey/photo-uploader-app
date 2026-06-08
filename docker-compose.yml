@@ -1,0 +1,50 @@
+# Offline-capable local stack. Mirrors the ECS env-var contract but swaps the
+# AWS dependencies for local stand-ins:
+#   - RDS PostgreSQL  -> a postgres container
+#   - S3 + CloudFront -> local-disk storage served by the app at /media/**
+#
+#   docker compose up --build   then open http://localhost:8080
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: photogallery
+      POSTGRES_USER: photo
+      POSTGRES_PASSWORD: photo
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U photo -d photogallery"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    ports:
+      # Host 5433 -> container 5432, so it won't clash with a local Postgres.
+      # The app reaches Postgres over the internal network, not this mapping.
+      - "5433:5432"
+
+  app:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # --- storage: local disk, served by the app (no S3/CloudFront locally) ---
+      STORAGE_DRIVER: local
+      STORAGE_LOCAL_DIR: /data/uploads
+      # --- database: plain vars (prod uses DB_CREDENTIALS secret JSON instead) ---
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: photogallery
+      DB_USERNAME: photo
+      DB_PASSWORD: photo
+      # --- the container binds 80 (same as Fargate); mapped to 8080 on the host ---
+      SERVER_PORT: "80"
+    ports:
+      - "8080:80"
+    volumes:
+      - uploads:/data/uploads
+
+volumes:
+  pgdata:
+  uploads:
