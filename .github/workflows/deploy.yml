@@ -1,9 +1,5 @@
 name: Build and push to ECR
 
-# Application repo CI/CD. Authenticates to AWS with GitHub OIDC (no long-lived
-# keys) and pushes the image to ECR. Pushing :latest is what the infrastructure
-# repo's CodePipeline watches for — it then runs the CodeDeploy blue/green
-# rollout onto ECS. This workflow never talks to ECS/CodeDeploy directly.
 on:
   push:
     branches: [main]
@@ -44,15 +40,12 @@ jobs:
       - name: Build, tag, and push image to ECR
         env:
           REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-          REPOSITORY: ${{ vars.ECR_REPOSITORY }}
-          IMAGE_TAG: ${{ github.sha }}
+          REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
         run: |
           set -euo pipefail
-          docker build -t "$REGISTRY/$REPOSITORY:$IMAGE_TAG" .
-          docker tag "$REGISTRY/$REPOSITORY:$IMAGE_TAG" "$REGISTRY/$REPOSITORY:latest"
-          docker push "$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+          docker build -t "$REGISTRY/$REPOSITORY:latest" .
           docker push "$REGISTRY/$REPOSITORY:latest"
-          echo "Pushed $REGISTRY/$REPOSITORY:$IMAGE_TAG and :latest"
+          echo "Pushed $REGISTRY/$REPOSITORY:latest"
 
       - name: Deployment triggered
         run: |
