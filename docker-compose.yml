@@ -3,7 +3,7 @@
 #   - RDS PostgreSQL  -> a postgres container
 #   - S3 + CloudFront -> local-disk storage served by the app at /media/**
 #
-#   docker compose up --build.   then open http://localhost:8080
+#   docker compose up --build..   then open http://localhost:8080
 services:
   postgres:
     image: postgres:16-alpine
